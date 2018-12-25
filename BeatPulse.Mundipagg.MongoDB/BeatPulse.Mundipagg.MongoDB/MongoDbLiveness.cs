@@ -15,10 +15,20 @@ namespace BeatPulse.Mundipagg.MongoDB
 
         public MongoDbLiveness(IConfiguration configuration)
         {
-            var connectionString = configuration.GetSection("MongoDbConnectionString").Value;
-            var client = new MongoClient(connectionString);
+            var port = int.Parse(configuration.GetSection("MongoDbConnectionPort").Value);
+            var servers = new List<MongoServerAddress>
+            {
+                new MongoServerAddress(configuration.GetSection("MongoDbConnectionHost").Value, port)
+            };
 
-            _database = client.GetDatabase(new MongoUrl(connectionString).DatabaseName);
+            var settings = new MongoClientSettings()
+            {
+                Servers = servers
+            };
+            
+            var client = new MongoClient(settings);
+
+            _database = client.GetDatabase(configuration.GetSection("MongoDbDatabaseName").Value);
         }
 
         public async Task<LivenessResult> IsHealthy(LivenessExecutionContext context, CancellationToken cancellationToken = default(CancellationToken))

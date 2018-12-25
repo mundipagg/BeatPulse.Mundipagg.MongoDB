@@ -6,14 +6,12 @@ namespace BeatPulse.Mundipagg.MongoDB
 {
     public static class MongoDBExtension
     {
-        public static BeatPulseContext AddMongoCheck(this BeatPulseContext beatPulseContext, IServiceCollection services, string name, Action<BeatPulseLivenessRegistrationOptions> setup)
+        public static BeatPulseContext AddMongoCheck(this BeatPulseContext beatPulseContext, ServiceProvider serviceProvider, string name, Action<BeatPulseLivenessRegistrationOptions> setup)
         {
-            var provider = Ioc.GetMongoDbLiveness(services);
-
             return beatPulseContext.AddLiveness(name, opt =>
             {
                 opt.UsePath("mongodb");
-                opt.UseLiveness(provider.GetService<IBeatPulseLiveness>());
+                opt.UseLiveness(serviceProvider.GetService<IBeatPulseLiveness>());
             });
         }
     }
